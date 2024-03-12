@@ -3,7 +3,10 @@ import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import Home from './src/Screens/Home'
+
 import MapComponent from './src/Screens/MapComponent'
+import GoogleMapSearchLocation from './src/Screens/GoogleMapSearchLocation'
+
 const stack=createStackNavigator();
 const App = () => {
   return (
@@ -11,6 +14,8 @@ const App = () => {
       <stack.Navigator>
         <stack.Screen name="Home" component={Home}/>
         <stack.Screen name="MapComponent" component={MapComponent}/>
+        <stack.Screen name='GoogleMapSearchLocation' component={GoogleMapSearchLocation}/>
+       
       </stack.Navigator>
     </NavigationContainer>
   )
