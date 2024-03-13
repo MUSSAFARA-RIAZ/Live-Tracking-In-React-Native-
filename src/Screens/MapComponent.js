@@ -9,93 +9,93 @@ import { useNavigation } from "@react-navigation/native";
 // console.logS(GOOGLE_API_KEY);
 // const Api="AIzaSyDK7vRWhnxX8DgluGK9oT5K47AfSEz-J84"
 export default function MapComponent() {
-    const navigation=useNavigation();
+  const navigation=useNavigation();
 
-  const [state, setstate] = useState({
-    pickupcords: {
-      latitude: 24.8607,
-      longitude: 67.0011,
-      // latitudeDelta: 0.0922,
-      // longitudeDelta: 0.0421,
-    },
-    dropcords: {
-      latitude: 31.5204,
-      longitude: 74.3587,
-      // latitudeDelta: 0.0922,
-      // longitudeDelta: 0.0421,
-    },
-  });
-  const mapRef = useRef(null);
+const [state, setstate] = useState({
+  pickupcords: {
+    latitude: 24.8607,
+    longitude: 67.0011,
+    // latitudeDelta: 0.0922,
+    // longitudeDelta: 0.0421,
+  },
+  dropcords: {
+    latitude: 31.5204,
+    longitude: 74.3587,
+    // latitudeDelta: 0.0922,
+    // longitudeDelta: 0.0421,
+  },
+});
+const mapRef = useRef(null);
 
-  const { pickupcords, dropcords } = state;
-  // const fetchValue=(data)=>{
-  //   console.log(data);
-    
-  // }
-  // console.log("frrrrrrrrrr",data.pickupLocation.latitude)
+const { pickupcords, dropcords } = state;
+// const fetchValue=(data)=>{
+//   console.log(data);
+  
+// }
+// console.log("frrrrrrrrrr",data.pickupLocation.latitude)
 
-  return (
-    <View style={styles.container}>
-      <View style={{ flex: 1 }}>
-        <MapView
-          style={StyleSheet.absoluteFill}
-          ref={mapRef}
-          initialRegion={{
+return (
+  <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      <MapView
+        style={StyleSheet.absoluteFill}
+        ref={mapRef}
+        initialRegion={{
 
-            ...pickupcords,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+          ...pickupcords,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        <Marker coordinate={state.pickupcords} />
+        <Marker coordinate={state.dropcords} />
+
+        <MapViewDirections
+          origin={state.pickupcords}
+          destination={state.dropcords}
+          apikey={GOOGLE_API_KEY}
+          strokeWidth={4}
+          strokeColor="red"
+          optimizeWaypoints={true}
+          onReady={(result) => {
+            mapRef.current.fitToCoordinates(result.coordinates, {
+              edgePadding: {
+                right: 50,
+                left: 30,
+                top: 100,
+                bottom: 300,
+              },
+            });
           }}
-        >
-          <Marker coordinate={state.pickupcords} />
-          <Marker coordinate={state.dropcords} />
+        />
+      </MapView>
+    </View>
+    <View style={styles.bottom}>
+      <Text>Where are you going ?</Text>
+      <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate("GoogleMapSearchLocation", { getCordinates: (data) => { 
+        setstate({
+          pickupcords:{
+            latitude:data.pickupLocation.latitude,
+            longitude:data.pickupLocation.longitude,
 
-          <MapViewDirections
-            origin={state.pickupcords}
-            destination={state.dropcords}
-            apikey={GOOGLE_API_KEY}
-            strokeWidth={4}
-            strokeColor="red"
-            optimizeWaypoints={true}
-            onReady={(result) => {
-              mapRef.current.fitToCoordinates(result.coordinates, {
-                edgePadding: {
-                  right: 50,
-                  left: 30,
-                  top: 100,
-                  bottom: 300,
-                },
-              });
-            }}
-          />
-        </MapView>
-      </View>
-      <View style={styles.bottom}>
-        <Text>Where are you going ?</Text>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate("GoogleMapSearchLocation", { getCordinates: (data) => { 
-          setstate({
-            pickupcords:{
-              latitude:data.pickupLocation.latitude,
-              longitude:data.pickupLocation.longitude,
+          },
+          dropcords:{
+            latitude:data.destinationLocation.latitude,
+            longitude:data.destinationLocation.longitude,
 
-            },
-            dropcords:{
-              latitude:data.destinationLocation.latitude,
-              longitude:data.destinationLocation.longitude,
-
-            }
-            
-
-          })
-        //  console.log("mmmmmmmmmmmmmmmmmmm",data.pickupLocation.latitude)
+          }
           
-           } })}>
-    <Text style={{ color: "white" }}>Choose Your Location</Text>
+
+        })
+      //  console.log("mmmmmmmmmmmmmmmmmmm",data.pickupLocation.latitude)
+        
+         } })}>
+  <Text style={{ color: "white" }}>Choose Your Location</Text>
 </TouchableOpacity>
 
-      </View>
     </View>
-  );
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
