@@ -12,6 +12,7 @@ const KARACHI_COORDINATES = {
 };
 
 export default function MapComponent() {
+<<<<<<< HEAD
   const navigation = useNavigation();
   const [state, setState] = useState({
     pickupcords: {
@@ -150,8 +151,95 @@ export default function MapComponent() {
           <Text style={{ color: "white" }}>Search Swap Station</Text>
         </TouchableOpacity>
       </View>
+=======
+  const navigation=useNavigation();
+
+const [state, setstate] = useState({
+  pickupcords: {
+    latitude: 24.8607,
+    longitude: 67.0011,
+    // latitudeDelta: 0.0922,
+    // longitudeDelta: 0.0421,
+  },
+  dropcords: {
+    latitude: 31.5204,
+    longitude: 74.3587,
+    // latitudeDelta: 0.0922,
+    // longitudeDelta: 0.0421,
+  },
+});
+const mapRef = useRef(null);
+
+const { pickupcords, dropcords } = state;
+// const fetchValue=(data)=>{
+//   console.log(data);
+  
+// }
+// console.log("frrrrrrrrrr",data.pickupLocation.latitude)
+
+return (
+  <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      <MapView
+        style={StyleSheet.absoluteFill}
+        ref={mapRef}
+        initialRegion={{
+
+          ...pickupcords,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        <Marker coordinate={state.pickupcords} />
+        <Marker coordinate={state.dropcords} />
+
+        <MapViewDirections
+          origin={state.pickupcords}
+          destination={state.dropcords}
+          apikey={GOOGLE_API_KEY}
+          strokeWidth={4}
+          strokeColor="red"
+          optimizeWaypoints={true}
+          onReady={(result) => {
+            mapRef.current.fitToCoordinates(result.coordinates, {
+              edgePadding: {
+                right: 50,
+                left: 30,
+                top: 100,
+                bottom: 300,
+              },
+            });
+          }}
+        />
+      </MapView>
     </View>
-  );
+    <View style={styles.bottom}>
+      <Text>Where are you going ?</Text>
+      <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate("GoogleMapSearchLocation", { getCordinates: (data) => { 
+        setstate({
+          pickupcords:{
+            latitude:data.pickupLocation.latitude,
+            longitude:data.pickupLocation.longitude,
+
+          },
+          dropcords:{
+            latitude:data.destinationLocation.latitude,
+            longitude:data.destinationLocation.longitude,
+
+          }
+          
+
+        })
+      //  console.log("mmmmmmmmmmmmmmmmmmm",data.pickupLocation.latitude)
+        
+         } })}>
+  <Text style={{ color: "white" }}>Choose Your Location</Text>
+</TouchableOpacity>
+
+>>>>>>> 5aef94015fc2dc5d5eb02ae31477bf0a151ad303
+    </View>
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
