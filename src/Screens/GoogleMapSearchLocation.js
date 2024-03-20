@@ -10,6 +10,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import GOOGLE_API_KEY from "../../constants";
 import AddressPickup from "../Components/AddressPickup";
 import { useNavigation } from "@react-navigation/native";
+import FlashMessage from "react-native-flash-message";
 
 const GoogleMapSearchLocation = (props) => {
   const navigation = useNavigation();
@@ -67,6 +68,8 @@ const GoogleMapSearchLocation = (props) => {
       />
     </View>
   );
+  console.log("I am out of zone", state);
+  
 
   return (
     <View style={styles.container}>

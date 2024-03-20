@@ -1,38 +1,79 @@
-import { StatusBar } from "expo-status-bar";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { useState, useRef } from "react";
 import MapViewDirections from "react-native-maps-directions";
-import GOOGLE_API_KEY from "../../constants";
 import { useNavigation } from "@react-navigation/native";
+import * as Location from "expo-location";
+import GOOGLE_API_KEY from "../../constants";
 
-// console.logS(GOOGLE_API_KEY);
-// const Api="AIzaSyDK7vRWhnxX8DgluGK9oT5K47AfSEz-J84"
+const KARACHI_COORDINATES = {
+  latitude: 24.8607,
+  longitude: 67.0011,
+};
+
 export default function MapComponent() {
-    const navigation=useNavigation();
-
-  const [state, setstate] = useState({
+  const navigation = useNavigation();
+  const [state, setState] = useState({
     pickupcords: {
-      latitude: 24.8607,
-      longitude: 67.0011,
-      // latitudeDelta: 0.0922,
-      // longitudeDelta: 0.0421,
+      latitude: KARACHI_COORDINATES.latitude,
+      longitude: KARACHI_COORDINATES.longitude,
     },
     dropcords: {
       latitude: 31.5204,
       longitude: 74.3587,
-      // latitudeDelta: 0.0922,
-      // longitudeDelta: 0.0421,
     },
   });
   const mapRef = useRef(null);
 
   const { pickupcords, dropcords } = state;
-  // const fetchValue=(data)=>{
-  //   console.log(data);
+
+  const getCurrentLocation = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      console.log("Permission to access location was denied");
+      return;
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    setState((prevState) => ({
+      ...prevState,
+      pickupcords: {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      },
+      dropcords: {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      },
+    }));
+  };
+
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
+
+  const navigateToSearchDestination = () => {
+    navigation.navigate("GoogleMapSearchDestination", {
+      getCordinates: (data) => {
+        // Check if data is received
+        if (data && data.destinationLocation) {
+          setState((prevState) => ({
+            ...prevState,
+            dropcords: {
+              // Set destination coordinates from user input
+              latitude: data.destinationLocation.latitude,
+              longitude: data.destinationLocation.longitude,
+            },
+          }));
+        } else {
+          // Handle if destinationLocation data is not received
+          console.log("Invalid destination location data");
+        }
+      },
+    });
     
-  // }
-  // console.log("frrrrrrrrrr",data.pickupLocation.latitude)
+  };
+  console.log("Mussaafaraaaaaaa", state);
 
   return (
     <View style={styles.container}>
@@ -41,18 +82,16 @@ export default function MapComponent() {
           style={StyleSheet.absoluteFill}
           ref={mapRef}
           initialRegion={{
-
-            ...pickupcords,
+            ...KARACHI_COORDINATES,
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
         >
-          <Marker coordinate={state.pickupcords} />
-          <Marker coordinate={state.dropcords} />
-
+          <Marker coordinate={pickupcords} />
+          <Marker coordinate={dropcords} />
           <MapViewDirections
-            origin={state.pickupcords}
-            destination={state.dropcords}
+            origin={pickupcords}
+            destination={dropcords}
             apikey={GOOGLE_API_KEY}
             strokeWidth={4}
             strokeColor="red"
@@ -71,28 +110,45 @@ export default function MapComponent() {
         </MapView>
       </View>
       <View style={styles.bottom}>
-        <Text>Where are you going ?</Text>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate("GoogleMapSearchLocation", { getCordinates: (data) => { 
-          setstate({
-            pickupcords:{
-              latitude:data.pickupLocation.latitude,
-              longitude:data.pickupLocation.longitude,
-
-            },
-            dropcords:{
-              latitude:data.destinationLocation.latitude,
-              longitude:data.destinationLocation.longitude,
-
-            }
-            
-
-          })
-        //  console.log("mmmmmmmmmmmmmmmmmmm",data.pickupLocation.latitude)
-          
-           } })}>
-    <Text style={{ color: "white" }}>Choose Your Location</Text>
-</TouchableOpacity>
-
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={() =>
+            navigation.navigate("GoogleMapSearchLocation", {
+              getCordinates: (data) => {
+                setState({
+                  pickupcords: {
+                    latitude: data.pickupLocation.latitude,
+                    longitude: data.pickupLocation.longitude,
+                  },
+                  dropcords: {
+                    latitude: data.destinationLocation.latitude,
+                    longitude: data.destinationLocation.longitude,
+                  },
+                });
+              },
+            })
+          }
+        >
+          <Text style={{ color: "white" }}>Choose Your Location</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={getCurrentLocation}>
+          <Text
+            style={{
+              backgroundColor: "blue",
+              color: "white",
+              padding: 10,
+              marginBottom: 10,
+            }}
+          >
+            Turn On Current Location
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={navigateToSearchDestination}
+        >
+          <Text style={{ color: "white" }}>Search Swap Station</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -102,18 +158,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  bottom:{
-    backgroundColor:"white",
-    padding:30,
-    borderTopEndRadius:30,
-    borderTopStartRadius:30,
-    width:"100%"
-
+  bottom: {
+    backgroundColor: "white",
+    padding: 30,
+    borderTopEndRadius: 30,
+    borderTopStartRadius: 30,
+    width: "100%",
   },
-  btn:{
-    backgroundColor:"red",
-    borderColor:"white",
-    borderRadius:10,
-    padding:10,
-  }
+  btn: {
+    backgroundColor: "red",
+    borderColor: "white",
+    borderRadius: 10,
+    padding: 10,
+  },
 });
