@@ -6,6 +6,7 @@ import Home from './src/Screens/Home'
 
 import MapComponent from './src/Screens/MapComponent'
 import GoogleMapSearchLocation from './src/Screens/GoogleMapSearchLocation'
+import GoogleMapSearchDestination from './src/Screens/GoogleMapSearchDestination'
 
 const stack=createStackNavigator();
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
         <stack.Screen name="Home" component={Home}/>
         <stack.Screen name="MapComponent" component={MapComponent}/>
         <stack.Screen name='GoogleMapSearchLocation' component={GoogleMapSearchLocation}/>
+        <stack.Screen name='GoogleMapSearchDestination' component={GoogleMapSearchDestination}/>
        
       </stack.Navigator>
     </NavigationContainer>
